@@ -7,14 +7,18 @@ export function Badge({
   className,
 }: {
   children: ReactNode;
-  tone?: 'accent' | 'light';
+  /** accent — signal orange (price drop), success — green (great price), ink — dark (just arrived), light — neutral */
+  tone?: 'accent' | 'light' | 'success' | 'ink';
   className?: string;
 }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-control px-2.5 py-1 text-xs font-semibold',
-        tone === 'accent' ? 'bg-accent text-on-accent' : 'bg-bg text-fg ring-1 ring-line',
+        'inline-flex items-center rounded-badge px-2 py-1 text-[11px] font-bold tracking-wide uppercase',
+        tone === 'accent' && 'bg-accent text-on-accent',
+        tone === 'success' && 'bg-success text-white',
+        tone === 'ink' && 'bg-ink text-white',
+        tone === 'light' && 'bg-bg text-fg ring-1 ring-line',
         className,
       )}
     >
@@ -27,7 +31,7 @@ export function ChipList({ items, className }: { items: string[]; className?: st
   return (
     <ul className={cn('flex flex-wrap gap-2', className)}>
       {items.map((c) => (
-        <li key={c} className="rounded-control border border-line px-3 py-1 text-sm">
+        <li key={c} className="rounded-badge bg-surface px-2.5 py-1 text-sm font-medium">
           {c}
         </li>
       ))}

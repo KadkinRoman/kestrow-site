@@ -10,9 +10,9 @@ export function Steps({ items, labels, className }: { items: OrderStage[]; label
   return (
     <ol className={cn('mt-8 grid gap-4 sm:grid-cols-2', cols, className)}>
       {items.map((s, i) => (
-        <li key={s.id} className="relative rounded-card border border-line bg-paper p-5">
+        <li key={s.id} className="relative rounded-card border border-line border-t-4 border-t-primary bg-paper p-5">
           <div className="flex items-baseline justify-between gap-3">
-            <b className="font-display text-4xl font-normal text-accent">{String(i + 1).padStart(2, '0')}</b>
+            <b className="font-display text-4xl text-primary tabular">{String(i + 1).padStart(2, '0')}</b>
             {labels?.[i] && <span className="text-xs font-medium tracking-wide text-fg-muted uppercase">{labels[i]}</span>}
           </div>
           <h3 className="mt-3 font-semibold">{s.title}</h3>
@@ -29,11 +29,11 @@ export function Faq({ items, name = 'faq' }: { items: FaqItem[]; name?: string }
     <div className="mt-8 divide-y divide-line border-y border-line">
       {items.map((f) => (
         <details key={f.id} name={name} className="group">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-6 font-display text-2xl">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-6 py-5 text-lg font-semibold">
             {f.question}
             <span
               aria-hidden
-              className="flex size-8 shrink-0 items-center justify-center rounded-full border border-line transition-transform group-open:rotate-45"
+              className="flex size-8 shrink-0 items-center justify-center rounded-control bg-surface text-primary transition-transform group-open:rotate-45"
             >
               +
             </span>

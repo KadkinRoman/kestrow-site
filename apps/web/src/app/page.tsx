@@ -3,8 +3,8 @@ import { ModalButton } from '@/components/modals/ModalButton';
 import { ProjectCase } from '@/components/sections/Cards';
 import { CostEstimator } from '@/components/sections/CostEstimator';
 import { CtaBox, FinalCta, QuizCta } from '@/components/sections/Cta';
-import { HeroVideo } from '@/components/sections/Hero';
-import { HeroPromos } from '@/components/sections/HeroPromos';
+import { HeroDealer } from '@/components/sections/Hero';
+import { HeroSearch } from '@/components/sections/HeroSearch';
 import { KitchenRail } from '@/components/sections/KitchenRail';
 import { ProofStrip } from '@/components/sections/ProofStrip';
 import {
@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/Button';
 import { Section, SectionHeading } from '@/components/ui/layout';
 import { Photo, staticPhoto } from '@/components/ui/Photo';
 import { Tile, TileGrid } from '@/components/ui/Tile';
-import { getHitKitchens, getProjects, getSettings } from '@/lib/content';
+import { getHitKitchens, getKitchenCategories, getKitchensForRail, getProjects, getSettings } from '@/lib/content';
 import { formatPrice } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { PRICE_FROM, REVIEW_SUMMARY } from '@/lib/trust';
@@ -28,43 +28,48 @@ import { PRICE_FROM, REVIEW_SUMMARY } from '@/lib/trust';
 const STEP_LABELS = ['Online', 'Same day', '30 min', '1 hour', 'Same day'];
 
 export default async function HomePage() {
-  const [settings, projects, hits] = await Promise.all([getSettings(), getProjects(2), getHitKitchens(10)]);
+  const [settings, projects, hits, categories, inventory] = await Promise.all([
+    getSettings(),
+    getProjects(2),
+    getHitKitchens(10),
+    getKitchenCategories(),
+    getKitchensForRail(60),
+  ]);
 
   return (
     <>
-      {/* 1 · Hero: specific value claim, price anchor, two clear actions, proof next to them */}
-      <HeroVideo
+      {/* 1 · Hero: search-first — body type + budget (price or monthly payment) → "Show N cars" */}
+      <HeroDealer
         eyebrow="Pre-owned cars · Denver, Colorado"
         title={
           <>
-            Cars you can trust, <em className="text-on-inverse/80">inspected top to bottom</em>
+            Find your next car.
+            <br />
+            <span className="text-primary-light">Know the payment first.</span>
           </>
         }
-        lead={`Hand-picked pre-owned cars, each one through a 172-point inspection, with one clear price and no haggling. Cars from ${formatPrice(PRICE_FROM)}, a 7-day money-back guarantee and free delivery within 100 miles.`}
-        aside={<HeroPromos />}
-        actions={
-          <>
-            <Button href={`${routes.home()}#estimate`} variant="contrast" size="lg">
-              Calculate my payment
-            </Button>
-            <Button href={routes.catalog()} variant="inverse" size="lg">
-              Browse 30 cars
-            </Button>
-          </>
+        lead={`Every car passes a 172-point inspection and comes with one no-haggle price, a 7-day money-back guarantee and free delivery within 100 miles. Cars from ${formatPrice(PRICE_FROM)}.`}
+        search={
+          <HeroSearch
+            cars={inventory.map((k) => ({ category: k.category.slug, price: k.price }))}
+            categories={categories.map((c) => ({ slug: c.slug, name: c.name, shortName: c.shortName }))}
+          />
         }
         proof={
-          <span className="flex flex-wrap items-center gap-x-5 gap-y-2">
-            <span>
+          <div>
+            <div className="flex items-baseline gap-2">
+              <b className="font-display text-4xl tabular">{REVIEW_SUMMARY.rating}</b>
               <span className="text-star" aria-hidden>
-                ★★★★★{' '}
+                ★★★★★
               </span>
-              {REVIEW_SUMMARY.rating} from {REVIEW_SUMMARY.countLabel} reviews
-            </span>
-            <span aria-hidden className="hidden h-4 w-px bg-on-inverse/25 sm:block" />
-            <span>Free vehicle history report</span>
-            <span aria-hidden className="hidden h-4 w-px bg-on-inverse/25 sm:block" />
-            <span>Pre-approval in 2 minutes, no credit impact</span>
-          </span>
+            </div>
+            <p className="text-sm text-fg-muted">{REVIEW_SUMMARY.countLabel} reviews on {REVIEW_SUMMARY.source}</p>
+            <ul className="mt-3 space-y-1.5 border-t border-line pt-3 text-sm">
+              <li>✓ 172-point inspection</li>
+              <li>✓ 7-day money-back guarantee</li>
+              <li>✓ Pre-approval with no credit impact</li>
+            </ul>
+          </div>
         }
       />
 

@@ -31,6 +31,8 @@ Highlights:
 
 All content and images are demo data. Photographs are Creative Commons licensed; credits are listed on the `/credits` page.
 
+**Design:** the visual language, navigation and key flows (search-first hero, click-to-open mega menu, filter sidebar, sticky vehicle price panel) are documented with their research sources in [`docs/design.md`](docs/design.md).
+
 ## Quick start
 
 Requirements: Node.js 20.9-24 (24 LTS recommended, see `.nvmrc`; `npm test` needs 22.18+), npm 10+.

@@ -2,25 +2,25 @@ import Link from 'next/link';
 import { cn } from '@/lib/cn';
 import type { SocialLink } from '@/lib/content/types';
 
-export function Logo({ tagline, className, dark }: { tagline?: string; className?: string; dark?: boolean }) {
+export function Logo({ className, dark }: { className?: string; dark?: boolean }) {
   return (
-    <Link href="/" className={cn('flex shrink-0 items-center gap-3', className)} aria-label="Kestrow Motors — home">
+    <Link href="/" className={cn('flex shrink-0 items-center gap-2.5 rounded-control', className)} aria-label="Kestrow Motors — home">
       <span
         aria-hidden
         className={cn(
-          'flex size-10 items-center justify-center rounded-[11px] font-display text-[26px] leading-none',
-          dark ? 'bg-on-inverse text-inverse' : 'bg-primary text-on-primary',
+          'flex size-9 items-center justify-center rounded-control font-display text-[28px] leading-none',
+          dark ? 'bg-on-inverse text-ink' : 'bg-primary text-on-primary',
         )}
       >
         K
       </span>
-      <span className="leading-none">
-        <span className="block font-display text-[27px] tracking-[-0.01em]">Kestrow</span>
-        {tagline && (
-          <small className={cn('mt-1 hidden text-[11px] tracking-[0.14em] uppercase sm:block xl:hidden 2xl:block', dark ? 'text-on-inverse-muted' : 'text-fg-muted')}>
-            {tagline}
-          </small>
-        )}
+      <span aria-hidden className="leading-none">
+        <span className="block font-display text-[25px] tracking-[0.02em] uppercase">Kestrow</span>
+        <span
+          className={cn('mt-0.5 block text-[10px] font-semibold tracking-[0.32em] uppercase', dark ? 'text-on-inverse-muted' : 'text-fg-muted')}
+        >
+          Motors
+        </span>
       </span>
     </Link>
   );

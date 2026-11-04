@@ -7,22 +7,22 @@ export type ButtonVariant = 'primary' | 'secondary' | 'inverse' | 'contrast' | '
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-control font-medium text-center transition-colors ' +
+  'inline-flex items-center justify-center gap-2 rounded-control font-semibold text-center transition-colors duration-150 ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ' +
   'disabled:pointer-events-none disabled:opacity-50';
 
 const variants: Record<ButtonVariant, string> = {
   primary: 'bg-primary text-on-primary hover:bg-primary-hover',
-  secondary: 'border border-fg/25 bg-bg text-fg hover:border-fg',
-  inverse: 'border border-on-inverse/40 text-on-inverse hover:bg-on-inverse/10',
-  contrast: 'bg-on-inverse text-inverse hover:bg-on-inverse/85',
-  ghost: 'text-fg underline-offset-4 hover:underline',
+  secondary: 'border-[1.5px] border-ink bg-bg text-ink hover:bg-ink hover:text-on-inverse',
+  inverse: 'border-[1.5px] border-on-inverse/50 text-on-inverse hover:border-on-inverse hover:bg-on-inverse/10',
+  contrast: 'bg-on-inverse text-ink hover:bg-on-inverse/90',
+  ghost: 'text-primary underline-offset-4 hover:underline',
 };
 
 const sizes: Record<ButtonSize, string> = {
   sm: 'min-h-9 px-4 text-sm',
-  md: 'min-h-11 px-6 text-[15px]',
-  lg: 'min-h-13 px-8 text-base',
+  md: 'min-h-11 px-5 text-[15px]',
+  lg: 'min-h-12 px-7 text-base',
 };
 
 export function buttonClass(variant: ButtonVariant = 'primary', size: ButtonSize = 'md', className?: string) {

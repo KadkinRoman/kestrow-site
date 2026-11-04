@@ -26,12 +26,14 @@ export function CtaBox({ title, text, eyebrow, dark = true, actions, aside, id }
       <div
         className={cn(
           'grid items-center gap-8 rounded-block p-6 md:p-10 lg:grid-cols-[1.2fr_1fr] lg:gap-12',
-          dark ? 'bg-inverse text-on-inverse' : 'bg-surface',
+          dark ? 'bg-inverse text-on-inverse ring-1 ring-primary/30' : 'border border-line bg-surface',
         )}
       >
         <div>
-          {eyebrow && <div className={cn('mb-2 text-sm', dark ? 'text-on-inverse-muted' : 'text-fg-muted')}>{eyebrow}</div>}
-          <h2 className="text-2xl font-semibold md:text-4xl">{title}</h2>
+          {eyebrow && (
+            <p className={cn('eyebrow mb-3', dark && 'text-primary-light before:bg-primary-light')}>{eyebrow}</p>
+          )}
+          <h2 className="text-3xl md:text-5xl">{title}</h2>
           {text && <p className={cn('mt-4 md:text-lg', dark ? 'text-on-inverse-muted' : 'text-fg-muted')}>{text}</p>}
           {actions && <div className="mt-6 flex flex-wrap gap-3">{actions}</div>}
         </div>

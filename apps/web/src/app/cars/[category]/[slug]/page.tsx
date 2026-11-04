@@ -5,24 +5,17 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { LeadForm } from '@/components/forms/LeadForm';
 import { ModalButton } from '@/components/modals/ModalButton';
 import { CheckList, SpecsGrid } from '@/components/sections/Blocks';
-import { CtaBox, QuizCta } from '@/components/sections/Cta';
+import { CtaBox } from '@/components/sections/Cta';
 import { KitchenRail } from '@/components/sections/KitchenRail';
-import {
-  BlogTeaserSection,
-  GuaranteesSection,
-  PromosRailSection,
-  ReviewsSection,
-  StepsSection,
-} from '@/components/sections/Shared';
-import { Badge } from '@/components/ui/Badge';
+import { ReviewsSection } from '@/components/sections/Shared';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Button } from '@/components/ui/Button';
-import { Container, Section, SectionHeading } from '@/components/ui/layout';
-import { Photo } from '@/components/ui/Photo';
-import { Tile, TileGrid } from '@/components/ui/Tile';
+import { Container, Section } from '@/components/ui/layout';
 import { RichText } from '@/components/ui/RichText';
+import { MobileBuyBar } from '@/components/vehicle/MobileBuyBar';
+import { VehicleBadges } from '@/components/vehicle/VehicleBadges';
+import { VehicleGallery } from '@/components/vehicle/VehicleGallery';
 import { getKitchen, getKitchenSlugs, getSimilarKitchens } from '@/lib/content';
-import { discountPercent, formatPrice, installmentFrom } from '@/lib/format';
+import { formatPrice, installmentFrom } from '@/lib/format';
 import { routes } from '@/lib/routes';
 import { atLeastOne } from '@/lib/static-params';
 import { REVIEW_SUMMARY } from '@/lib/trust';
@@ -46,6 +39,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+const TRUST = ['172-point inspection', '7-day money-back guarantee', 'Free vehicle history report', '12-month warranty'];
+
 export default async function KitchenPage({ params }: Props) {
   const { category, slug } = await params;
   const kitchen = await getKitchen(slug);
@@ -54,11 +51,24 @@ export default async function KitchenPage({ params }: Props) {
   if (kitchen.category.slug !== category) permanentRedirect(routes.kitchen(kitchen.category.slug, kitchen.slug));
 
   const similar = await getSimilarKitchens(kitchen.slug, kitchen.category.slug);
-  const discount = discountPercent(kitchen.price, kitchen.oldPrice);
+  const price = formatPrice(kitchen.price);
+  const payment = formatPrice(installmentFrom(kitchen.price));
+  const facts = [
+    { label: 'Year', value: kitchen.height },
+    { label: 'Mileage', value: kitchen.dimensions },
+    { label: 'Fuel', value: kitchen.style && cap(kitchen.style) },
+    { label: 'Drivetrain', value: kitchen.facade },
+    { label: 'Color', value: kitchen.color && cap(kitchen.color) },
+  ].filter((f): f is { label: string; value: string } => !!f.value);
+  const leadModal = {
+    type: 'lead' as const,
+    title: `Check availability: ${kitchen.name}`,
+    text: 'Leave your contact details. A sales consultant will confirm availability and send you the out-the-door price.',
+    extra: { kitchen: kitchen.name },
+  };
 
   return (
-    <>
-      {/* 1 · Photos, price, buttons */}
+    <div className="pb-24 lg:pb-0">
       <section className="pt-6 pb-10">
         <Container>
           <Breadcrumbs
@@ -68,208 +78,158 @@ export default async function KitchenPage({ params }: Props) {
               { label: kitchen.name },
             ]}
           />
-          <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_1fr] lg:gap-12">
-            <div>
-              <Photo media={kitchen.gallery[0]} label="Main car photo" ratio="4/3" priority sizes="(min-width: 1024px) 700px, 100vw" />
-              {kitchen.gallery.length > 1 && (
-                <div className="mt-3 grid grid-cols-6 gap-2">
-                  {kitchen.gallery.slice(0, 6).map((m, i) => (
-                    <Photo key={i} media={m} label={`Photo ${i + 1}`} ratio="1/1" sizes="120px" />
-                  ))}
-                </div>
-              )}
+          <div className="mt-5 grid gap-x-10 gap-y-8 lg:grid-cols-[minmax(0,1fr)_400px]">
+            {/* 1 · Gallery */}
+            <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+              <VehicleGallery photos={kitchen.gallery} name={kitchen.name} />
             </div>
-            <div>
-              <div className="flex flex-wrap gap-2">
-                {discount > 0 && <Badge>−{discount}%</Badge>}
-                {kitchen.badge && <Badge tone="light">{kitchen.badge}</Badge>}
+
+            {/* 2 · Sticky price / CTA panel */}
+            <aside aria-label="Price and actions" className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-start lg:sticky lg:top-24">
+              <div className="rounded-card border border-line bg-bg p-5 md:p-6">
+                <VehicleBadges kitchen={kitchen} />
+                <h1 className="mt-3 text-3xl md:text-4xl">{kitchen.name}</h1>
+                <p className="mt-2 text-fg-muted">{kitchen.shortDesc}</p>
+
+                <div className="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <b className="font-display tabular text-4xl md:text-5xl">{price}</b>
+                  {kitchen.oldPrice && <s className="tabular text-lg text-fg-muted">{formatPrice(kitchen.oldPrice)}</s>}
+                </div>
+                <p className="tabular mt-1 text-lg font-semibold">≈ {payment}/mo*</p>
+                <p className="mt-2 text-xs text-fg-muted">
+                  *Est. payment: 5.9% APR, 72 months, $0 down, before taxes and fees. One no-haggle price; tax, title
+                  and registration are added at signing.{' '}
+                  <ModalButton modal={{ type: 'installment' }} unstyled className="underline underline-offset-2 hover:text-fg">
+                    See terms
+                  </ModalButton>
+                </p>
+
+                <div className="mt-5 grid gap-3">
+                  <ModalButton size="lg" modal={leadModal}>
+                    Check availability
+                  </ModalButton>
+                  <ModalButton
+                    size="lg"
+                    variant="secondary"
+                    modal={{
+                      type: 'lead',
+                      title: 'Book a test drive',
+                      text: 'Pick a time and we will have the car cleaned and ready at the showroom.',
+                      form: { formId: 'zamer', submitLabel: 'Book now' },
+                      extra: { kitchen: kitchen.name },
+                    }}
+                  >
+                    Book a test drive
+                  </ModalButton>
+                  <Link
+                    href={routes.materials()}
+                    className="inline-flex min-h-11 items-center justify-center text-sm font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    Value my trade-in →
+                  </Link>
+                </div>
+
+                <ul className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+                  {TRUST.map((t) => (
+                    <li key={t} className="flex gap-2">
+                      <span aria-hidden className="text-success">
+                        ✓
+                      </span>
+                      {t}
+                    </li>
+                  ))}
+                  <li className="flex gap-2 text-fg-muted">
+                    <span aria-hidden className="text-star">
+                      ★
+                    </span>
+                    {REVIEW_SUMMARY.rating} from {REVIEW_SUMMARY.countLabel} reviews
+                  </li>
+                </ul>
               </div>
-              <h1 className="mt-4 text-3xl font-semibold md:text-5xl">{kitchen.name}</h1>
-              <p className="mt-2 text-fg-muted">{kitchen.shortDesc}</p>
-              <div className="mt-6 flex flex-wrap items-baseline gap-x-4">
-                <b className="font-display text-4xl font-normal md:text-5xl">{formatPrice(kitchen.price)}</b>
-                {kitchen.oldPrice && <s className="text-lg text-fg-muted">{formatPrice(kitchen.oldPrice)}</s>}
-              </div>
-              <div className="mt-2 text-fg-muted">
-                Estimated payment from {formatPrice(installmentFrom(kitchen.price))}/mo{' '}
-                <ModalButton modal={{ type: 'installment' }} unstyled className="underline underline-offset-2">
-                  see terms
-                </ModalButton>
-              </div>
-              <p className="mt-4 text-sm text-fg-muted">
-                One no-haggle price. Tax, title and registration are added at signing; there are no hidden dealer
-                fees on top.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <ModalButton
-                  size="lg"
-                  modal={{
-                    type: 'lead',
-                    title: `Get today's price on the ${kitchen.name}`,
-                    text: 'Leave your contact details. A sales consultant will confirm availability and send you the out-the-door price.',
-                    extra: { kitchen: kitchen.name },
-                  }}
-                >
-                  Reserve this car
-                </ModalButton>
-                <ModalButton
-                  size="lg"
-                  variant="secondary"
-                  modal={{
-                    type: 'lead',
-                    title: 'Book a test drive',
-                    text: 'Pick a time and we will have the car cleaned and ready at the showroom.',
-                    form: { formId: 'zamer', submitLabel: 'Book now' },
-                    extra: { kitchen: kitchen.name },
-                  }}
-                >
-                  Book a test drive
-                </ModalButton>
-              </div>
-              <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm text-fg-muted">
-                <li>
-                  <span className="text-star" aria-hidden>
-                    ★★★★★{' '}
-                  </span>
-                  {REVIEW_SUMMARY.rating} from {REVIEW_SUMMARY.countLabel} reviews
-                </li>
-                <li>✓ 172-point inspection</li>
-                <li>✓ 7-day money-back guarantee</li>
-                <li>✓ Free vehicle history report</li>
-              </ul>
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-card bg-surface p-4 text-sm">
-                <span>Right now you get a $1,000 trade-in bonus when you trade in your current car.</span>
-                <Link href={routes.promos()} className="font-medium underline underline-offset-2">
-                  Offer details
-                </Link>
-              </div>
+            </aside>
+
+            {/* 3 · Specs, features, description */}
+            <div className="min-w-0 space-y-10 lg:col-start-1 lg:row-start-2">
+              <section aria-labelledby="key-specs">
+                <h2 id="key-specs" className="text-2xl md:text-3xl">
+                  Key specs
+                </h2>
+                <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+                  {facts.map((f) => (
+                    <div key={f.label} className="rounded-card bg-surface p-3">
+                      <dt className="text-xs text-fg-muted">{f.label}</dt>
+                      <dd className="tabular mt-0.5 font-semibold">{f.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                {kitchen.specs.length > 0 && <SpecsGrid specs={kitchen.specs} className="mt-4" />}
+              </section>
+
+              {kitchen.highlights && kitchen.highlights.length > 0 && (
+                <section aria-labelledby="key-features">
+                  <h2 id="key-features" className="text-2xl md:text-3xl">
+                    Key features
+                  </h2>
+                  <CheckList
+                    items={kitchen.highlights.map((h) => (
+                      <Fragment key={h.title}>
+                        <b>{h.title}</b> {h.text}
+                      </Fragment>
+                    ))}
+                  />
+                </section>
+              )}
+
+              {(kitchen.included?.length || kitchen.excluded?.length) && (
+                <section aria-labelledby="included" className="grid gap-6 sm:grid-cols-2">
+                  <div>
+                    <h2 id="included" className="text-2xl md:text-3xl">
+                      Included with every car
+                    </h2>
+                    <CheckList items={kitchen.included ?? []} />
+                  </div>
+                  {kitchen.excluded?.length ? (
+                    <div>
+                      <h2 className="text-2xl md:text-3xl">Optional extras</h2>
+                      <CheckList items={kitchen.excluded} negative />
+                    </div>
+                  ) : null}
+                </section>
+              )}
+
+              <section aria-labelledby="about">
+                <h2 id="about" className="text-2xl md:text-3xl">
+                  About the {kitchen.name}
+                </h2>
+                <RichText blocks={kitchen.description} className="mt-4 space-y-4" />
+              </section>
             </div>
           </div>
         </Container>
       </section>
 
-      {/* 2 · Specifications */}
       <Section>
-        <SectionHeading title="Vehicle details" />
-        <SpecsGrid specs={kitchen.specs} className="mt-6" />
+        <KitchenRail title="Similar cars" kitchens={similar} />
+        <p className="mt-4 text-xs text-fg-muted">*Est. payment: 5.9% APR, 72 months, $0 down, before taxes and fees.</p>
       </Section>
 
-      {/* 3 · What the price includes */}
-      {(kitchen.included?.length || kitchen.excluded?.length) && (
-        <Section>
-          <SectionHeading title="What the price includes" />
-          <TileGrid cols={2} className="mt-6">
-            <Tile title="Included with every car" footer={<CheckList items={kitchen.included ?? []} />} />
-            <Tile title="Optional extras" footer={<CheckList items={kitchen.excluded ?? []} negative />} />
-          </TileGrid>
-        </Section>
-      )}
+      <ReviewsSection id="kitchen-reviews" />
 
-      {/* 4 · Description */}
-      <Section>
-        <div className="grid items-start gap-8 lg:grid-cols-2">
-          <div>
-            <SectionHeading title={`About the ${kitchen.name}`} />
-            <RichText blocks={kitchen.description} className="mt-4 space-y-4" />
-            {kitchen.highlights && (
-              <CheckList
-                items={kitchen.highlights.map((h) => (
-                  <Fragment key={h.title}>
-                    <b>{h.title}</b> {h.text}
-                  </Fragment>
-                ))}
-              />
-            )}
-          </div>
-          <Photo media={kitchen.gallery[1] ?? kitchen.gallery[0]} label="Interior and detail photos" sizes="(min-width: 1024px) 600px, 100vw" className="min-h-80" />
-        </div>
-      </Section>
-
-      {/* 5 · Want it for less */}
       <CtaBox
+        dark={false}
         title="Love this car but want a lower payment?"
         text="We'll find a similar car with fewer miles on the clock or a lower price, so the monthly payment fits your budget."
         aside={
           <LeadForm
             formId="cheaper"
             layout="inline"
-            dark
             submitLabel="Show me cheaper options"
             extra={{ kitchen: kitchen.name }}
           />
         }
       />
 
-      {/* 6 · Similar cars, right after "Want it for less" (final prototype) */}
-      <Section>
-        <KitchenRail title="Similar cars" kitchens={similar} />
-      </Section>
-
-      {/* 7 · Stages */}
-      <StepsSection group="kitchen" title="How to buy this car">
-        <ModalButton
-          modal={{
-            type: 'lead',
-            title: 'Book a test drive',
-            text: 'A sales consultant will confirm a time and have the car ready for you.',
-            form: { formId: 'zamer', submitLabel: 'Book my test drive' },
-          }}
-        >
-          Book a test drive
-        </ModalButton>
-        <Button href={routes.zamer()} variant="secondary">
-          How buying works
-        </Button>
-      </StepsSection>
-
-      {/* 8 · Offers */}
-      <PromosRailSection title="Offers and bonuses for you" subtitle="Special offers on your next car." />
-
-      {/* 9 · Reviews */}
-      <ReviewsSection id="kitchen-reviews" />
-
-      {/* 10 · Guarantees */}
-      <GuaranteesSection />
-
-      {/* 11 · Quiz */}
-      <QuizCta />
-
-      {/* 12 · Blog */}
-      <BlogTeaserSection />
-
-      {/* 13 · Final call to action */}
-      <CtaBox
-        title="Want this car in your driveway?"
-        text="Leave your phone number and a sales consultant will send you the out-the-door price and a monthly payment estimate."
-        aside={
-          <div className="flex flex-wrap gap-3">
-            <ModalButton
-              variant="contrast"
-              size="lg"
-              modal={{
-                type: 'lead',
-                title: "Get today's price",
-                text: 'Leave your phone number and a sales consultant will confirm availability and the price.',
-                extra: { kitchen: kitchen.name },
-              }}
-            >
-              {"Get today's price"}
-            </ModalButton>
-            <ModalButton
-              variant="inverse"
-              size="lg"
-              modal={{
-                type: 'lead',
-                title: 'Book a test drive',
-                text: 'Pick a time and we will have the car cleaned and ready at the showroom.',
-                form: { formId: 'zamer', submitLabel: 'Book now' },
-              }}
-            >
-              Book a test drive
-            </ModalButton>
-          </div>
-        }
-      />
-    </>
+      <MobileBuyBar name={kitchen.name} price={price} payment={payment} />
+    </div>
   );
 }

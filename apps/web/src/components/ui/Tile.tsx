@@ -22,7 +22,7 @@ export function Tile({ title, text, icon, number, media, footer, href, more, dar
     <>
       {media}
       {icon && (
-        <div className={cn('mb-4 flex size-11 items-center justify-center rounded-full', dark ? 'bg-on-inverse/15' : 'bg-surface-strong')} aria-hidden>
+        <div className={cn('mb-4 flex size-11 items-center justify-center rounded-control', dark ? 'bg-primary text-white' : 'bg-primary/10 text-primary')} aria-hidden>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M4 10.5l4 4 8-9" />
           </svg>
@@ -39,7 +39,7 @@ export function Tile({ title, text, icon, number, media, footer, href, more, dar
   const cls = cn(
     'flex h-full flex-col rounded-card p-5 md:p-6',
     dark ? 'bg-inverse text-on-inverse' : 'border border-line/70 bg-paper',
-    href && 'transition-shadow hover:shadow-card',
+    href && 'transition duration-150 hover:-translate-y-0.5 hover:border-primary',
     className,
   );
 

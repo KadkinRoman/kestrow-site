@@ -6,46 +6,50 @@ import { Photo, staticPhoto } from '@/components/ui/Photo';
 import { cn } from '@/lib/cn';
 import type { Media } from '@/lib/content/types';
 
-/** Home hero: full-bleed photo with a dark gradient, value claim, CTAs, proof line + offers panel. */
-export function HeroVideo({
+/**
+ * Home hero (dealership): night background, value claim and the search card on the left,
+ * a framed photo with a floating proof card on the right. Deliberately not full-bleed.
+ */
+export function HeroDealer({
   eyebrow,
   title,
   lead,
-  actions,
+  search,
   proof,
-  aside,
 }: {
   eyebrow?: ReactNode;
   title: ReactNode;
   lead: ReactNode;
-  actions: ReactNode;
-  /** Under the buttons: rating, warranty, lead time */
+  /** The search card (client component) */
+  search: ReactNode;
+  /** Floating card over the photo: rating and guarantees */
   proof?: ReactNode;
-  /** Right side: offers panel */
-  aside?: ReactNode;
 }) {
   return (
-    <section className="relative isolate overflow-hidden bg-inverse text-on-inverse">
-      <Photo
-        media={staticPhoto('hero-showroom.jpg', 'Car on a mountain road at sunset')}
-        label="Kestrow showroom"
-        priority
-        absolute
-        rounded={false}
-        className="inset-0 -z-20"
+    <section className="relative overflow-hidden bg-inverse text-on-inverse">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_80%_at_85%_10%,rgb(31_75_255/0.35),transparent_60%)]"
       />
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-inverse/90 via-inverse/70 to-inverse/25" aria-hidden />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-inverse/60 to-transparent" aria-hidden />
-      <Container className="flex min-h-[600px] items-end pt-24 pb-14 md:min-h-[min(86vh,820px)] md:pb-20">
-        <div className={cn('grid w-full items-end gap-10', !!aside && 'lg:grid-cols-[1fr_minmax(0,340px)]')}>
-          <div className="max-w-3xl">
-            {eyebrow && <p className="text-xs font-semibold tracking-[0.2em] text-on-inverse-muted uppercase">{eyebrow}</p>}
-            <h1 className="mt-4 text-5xl leading-[0.98] md:text-7xl xl:text-[5.5rem]">{title}</h1>
-            <p className="mt-6 max-w-xl text-lg text-on-inverse/85 md:text-xl">{lead}</p>
-            <div className="mt-9 flex flex-wrap gap-3">{actions}</div>
-            {proof && <div className="mt-8 text-sm text-on-inverse-muted">{proof}</div>}
-          </div>
-          {aside}
+      <Container className="relative grid items-center gap-10 py-12 md:py-16 lg:grid-cols-[1.05fr_1fr] lg:gap-14 lg:py-20">
+        <div>
+          {eyebrow && <p className="text-xs font-bold tracking-[0.16em] text-on-inverse-muted uppercase">{eyebrow}</p>}
+          <h1 className="mt-3 text-5xl leading-[0.95] md:text-7xl">{title}</h1>
+          <p className="mt-5 max-w-xl text-lg text-on-inverse/80">{lead}</p>
+          <div className="mt-8">{search}</div>
+        </div>
+        <div className="relative hidden lg:block">
+          <Photo
+            media={staticPhoto('showroom-1.jpg', 'Silver electric crossover in the Kestrow showroom')}
+            label="Kestrow showroom"
+            ratio="4/5"
+            priority
+            sizes="(min-width: 1024px) 560px, 0px"
+            className="rounded-card"
+          />
+          {proof && (
+            <div className="absolute -bottom-6 -left-6 max-w-xs rounded-card bg-bg p-5 text-fg shadow-modal">{proof}</div>
+          )}
         </div>
       </Container>
     </section>

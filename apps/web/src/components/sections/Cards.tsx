@@ -88,7 +88,7 @@ export function ReviewTextCard({ review }: { review: Review }) {
       <div className="mt-2">
         <Stars rating={review.rating} />
       </div>
-      {review.text && <p className="mt-4 line-clamp-6 font-display text-xl leading-snug">“{review.text}”</p>}
+      {review.text && <p className="mt-4 line-clamp-6 text-[15px] leading-relaxed">“{review.text}”</p>}
       <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-4 text-sm">
         {review.url && (
           <a href={review.url} target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">

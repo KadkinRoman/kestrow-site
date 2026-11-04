@@ -1,29 +1,46 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
+import { useEffect, useId, useTransition, type ReactNode } from 'react';
 import { cn } from '@/lib/cn';
 import type { FilterOption, KitchenFilterOptions } from '@/lib/content/types';
+import { routes } from '@/lib/routes';
 
-type Option = FilterOption;
+export type CategoryCount = { slug: string; name: string; count: number };
 
-type Props = { options: KitchenFilterOptions };
+/** URL keys of the inventory filters */
+export const FILTER_KEYS = ['price', 'style', 'color', 'facade', 'sale', 'hit', 'tag'] as const;
 
-/** Quick picks: fixed ones + collections from Strapi (kitchen-tag: "Under 30,000 miles", "Family-friendly") */
-const QUICK_BASE: { label: string; params: Record<string, string> }[] = [
-  { label: 'Under $25,000', params: { price: 'under-25k' } },
-  { label: 'Price drops', params: { sale: '1' } },
-  { label: 'Popular', params: { hit: '1' } },
-];
+type Props = {
+  options: KitchenFilterOptions;
+  /** Body types with the number of cars (links to the category pages) */
+  categories: CategoryCount[];
+  /** Current body type page */
+  category?: string;
+  /** The drawer shows "Updating…" while the URL change is being applied */
+  onPendingChange?: (pending: boolean) => void;
+  className?: string;
+};
 
-const FILTER_KEYS = ['price', 'style', 'color', 'facade', 'sale', 'hit', 'tag'];
+const ROW = 'flex min-h-11 cursor-pointer items-center gap-3 text-[15px]';
+const INPUT =
+  'size-[18px] shrink-0 cursor-pointer accent-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
-/** Inventory filters. State lives in the URL (?price=&style=…); the page reads it on the server. */
-export function CatalogFilters({ options }: Props) {
+/**
+ * Inventory filters as lists of radios / checkboxes. State lives in the URL (?price=&style=…),
+ * the page reads it on the server. Body types are links to the category pages (filters are kept).
+ */
+export function CatalogFilters({ options, categories, category, onPendingChange, className }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
   const [pending, startTransition] = useTransition();
+  const uid = useId();
+
+  useEffect(() => {
+    onPendingChange?.(pending);
+  }, [pending, onPendingChange]);
 
   function apply(next: Record<string, string | null>) {
     const sp = new URLSearchParams(params.toString());
@@ -36,79 +53,93 @@ export function CatalogFilters({ options }: Props) {
     startTransition(() => router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false }));
   }
 
-  const quick = [...QUICK_BASE, ...options.tags.map((t) => ({ label: t.label, params: { tag: t.value } }))];
-  const isQuickActive = (q: Record<string, string>) => Object.entries(q).every(([k, v]) => params.get(k) === v);
-  const hasFilters = FILTER_KEYS.some((k) => params.has(k));
+  const keep = new URLSearchParams(params.toString());
+  keep.delete('page');
+  const keepQs = keep.size ? `?${keep}` : '';
+  const total = categories.reduce((s, c) => s + c.count, 0);
 
-  const select = (name: string, label: string, opts: Option[]) => (
-    <label className="relative">
-      <span className="sr-only">{label}</span>
-      <select
-        value={params.get(name) ?? ''}
-        onChange={(e) => apply({ [name]: e.target.value || null })}
-        className="min-h-11 w-full appearance-none rounded-control border border-line bg-bg pr-9 pl-4 text-[15px]"
-      >
-        <option value="">{label}</option>
-        {opts.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
-      </select>
-      <span aria-hidden className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-xs text-fg-muted">
-        ▾
-      </span>
-    </label>
-  );
+  const radios = (name: string, title: string, opts: FilterOption[], open: boolean) => {
+    const current = params.get(name) ?? '';
+    return (
+      <Group title={title} open={open || !!current}>
+        {[{ value: '', label: 'Any' }, ...opts].map((o) => {
+          const id = `${uid}-${name}-${o.value || 'any'}`;
+          return (
+            <label key={id} htmlFor={id} className={ROW}>
+              <input
+                id={id}
+                type="radio"
+                name={`${uid}-${name}`}
+                checked={current === o.value}
+                onChange={() => apply({ [name]: o.value || null })}
+                className={INPUT}
+              />
+              {o.label}
+            </label>
+          );
+        })}
+      </Group>
+    );
+  };
+
+  const toggle = (name: 'sale' | 'hit', label: string) => {
+    const id = `${uid}-${name}`;
+    return (
+      <label htmlFor={id} className={ROW}>
+        <input
+          id={id}
+          type="checkbox"
+          checked={params.get(name) === '1'}
+          onChange={(e) => apply({ [name]: e.target.checked ? '1' : null })}
+          className={INPUT}
+        />
+        {label}
+      </label>
+    );
+  };
 
   return (
-    <div className={cn('space-y-4 transition-opacity', pending && 'opacity-60')}>
-      <div>
-        <div className="mb-2 text-sm text-fg-muted">Quick picks</div>
-        <div className="flex flex-wrap gap-2">
-          {quick.map((q) => {
-            const active = isQuickActive(q.params);
-            return (
-              <button
-                key={q.label}
-                type="button"
-                aria-pressed={active}
-                onClick={() => apply(Object.fromEntries(Object.entries(q.params).map(([k, v]) => [k, active ? null : v])))}
-                className={cn(
-                  'min-h-10 rounded-control border px-4 text-sm transition-colors',
-                  active ? 'border-fg bg-fg text-bg' : 'border-line hover:border-fg',
-                )}
-              >
-                {q.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto_auto]">
-        {select('price', 'Price', options.price)}
-        {select('style', 'Fuel', options.style)}
-        {select('color', 'Color', options.color)}
-        {select('facade', 'Drivetrain', options.facade)}
-        <label className="flex min-h-11 items-center gap-2 px-1 text-[15px]">
-          <input
-            type="checkbox"
-            checked={params.get('sale') === '1'}
-            onChange={(e) => apply({ sale: e.target.checked ? '1' : null })}
-          />
-          Price drops only
-        </label>
-        {hasFilters && (
-          <button
-            type="button"
-            onClick={() => apply(Object.fromEntries(FILTER_KEYS.map((k) => [k, null])))}
-            className="min-h-11 px-2 text-sm text-fg-muted underline underline-offset-2 hover:text-fg"
-          >
-            Reset
-          </button>
-        )}
-      </div>
+    <div className={cn('transition-opacity', pending && 'opacity-60', className)}>
+      <Group title="Body type" open>
+        {[{ slug: '', name: 'All body types', count: total }, ...categories].map((c) => {
+          const active = (category ?? '') === c.slug;
+          return (
+            <Link
+              key={c.slug || 'all'}
+              href={`${c.slug ? routes.category(c.slug) : routes.catalog()}${keepQs}`}
+              prefetch={false}
+              aria-current={active ? 'page' : undefined}
+              className={cn(ROW, '-mx-2 justify-between rounded-control px-2', active ? 'bg-surface font-semibold' : 'hover:bg-surface')}
+            >
+              <span>{c.name}</span>
+              <span className="tabular text-sm text-fg-muted">{c.count}</span>
+            </Link>
+          );
+        })}
+      </Group>
+      {radios('price', 'Price', options.price, true)}
+      {radios('style', 'Fuel', options.style, true)}
+      {radios('facade', 'Drivetrain', options.facade, false)}
+      {radios('color', 'Color', options.color, false)}
+      {options.tags.length > 0 && radios('tag', 'Collections', options.tags, false)}
+      <Group title="More" open>
+        {toggle('sale', 'Price drops only')}
+        {toggle('hit', 'Popular picks')}
+      </Group>
     </div>
+  );
+}
+
+function Group({ title, open, children }: { title: string; open: boolean; children: ReactNode }) {
+  return (
+    <details open={open} className="group border-b border-line py-1 first:pt-0 [&_summary::-webkit-details-marker]:hidden">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-control font-display text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+        {title}
+        <span aria-hidden className="text-fg-muted transition-transform group-open:rotate-180">
+          ▾
+        </span>
+      </summary>
+      <div className="pb-3">{children}</div>
+    </details>
   );
 }

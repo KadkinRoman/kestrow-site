@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ModalButton } from '@/components/modals/ModalButton';
 import { Container } from '@/components/ui/layout';
 import type { NavItem, SiteSettings } from '@/lib/content/types';
 import { routes } from '@/lib/routes';
@@ -14,45 +13,55 @@ type Props = {
 
 const linkCls = 'text-on-inverse-muted transition-colors hover:text-on-inverse';
 
+/** Guarantees strip above the footer columns — the dealership's promises in one line each */
+const GUARANTEES: [title: string, text: string, href: string][] = [
+  ['172-point inspection', 'Every car, before it is listed', routes.installation()],
+  ['7-day money-back', 'Changed your mind? Bring it back', routes.warranty()],
+  ['12-month warranty', 'Powertrain cover, 12,000 miles', routes.warranty()],
+  ['Free delivery', 'Within 100 miles of Denver', routes.delivery()],
+];
+
 export function Footer({ settings, columns, legal }: Props) {
   return (
     <footer className="mt-16 bg-inverse text-on-inverse">
-      <Container className="flex flex-col gap-8 border-b border-on-inverse/10 py-14 md:flex-row md:items-end md:justify-between md:py-20">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold tracking-[0.2em] text-on-inverse-muted uppercase">Find your next car</p>
-          <p className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">
-            Drive home something <em className="text-on-inverse-muted">you love.</em>
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <ModalButton
-            variant="contrast"
-            size="lg"
-            modal={{
-              type: 'lead',
-              title: 'Book a test drive',
-              text: 'Pick a car and a time. A sales consultant will call you back to confirm and have the car ready at the showroom.',
-              form: { formId: 'zamer', submitLabel: 'Book my test drive' },
-            }}
-          >
-            Book a test drive
-          </ModalButton>
-          <a href={settings.phoneHref} className="inline-flex min-h-13 items-center rounded-control border border-on-inverse/30 px-8 hover:bg-on-inverse/10">
-            {settings.phone}
-          </a>
-        </div>
-      </Container>
+      <div className="border-b border-on-inverse/10 bg-inverse-2">
+        <Container className="grid grid-cols-2 gap-px py-0 lg:grid-cols-4">
+          {GUARANTEES.map(([title, text, href]) => (
+            <Link key={title} href={href} className="group flex items-start gap-3 py-6 pr-4">
+              <span aria-hidden className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-control bg-primary text-white">
+                ✓
+              </span>
+              <span>
+                <b className="block font-display text-lg tracking-wide group-hover:text-primary-light">{title}</b>
+                <span className="text-sm text-on-inverse-muted">{text}</span>
+              </span>
+            </Link>
+          ))}
+        </Container>
+      </div>
 
-      <Container className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+      <Container className="grid gap-10 py-12 md:grid-cols-2 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
         <div className="space-y-5">
           <Logo dark />
-          <p className="max-w-xs text-on-inverse-muted">{settings.tagline || 'Hand-picked pre-owned and new cars in Denver, Colorado.'}</p>
+          <div>
+            <a href={settings.phoneHref} className="font-display text-3xl tabular hover:text-primary-light">
+              {settings.phone}
+            </a>
+            <p className="mt-1 text-sm text-on-inverse-muted">{settings.workHours}</p>
+          </div>
+          <p className="max-w-xs text-sm text-on-inverse-muted">
+            {settings.address}
+            <br />
+            <a href={`mailto:${settings.email}`} className={linkCls}>
+              {settings.email}
+            </a>
+          </p>
           <Socials items={settings.socials} dark />
         </div>
 
         {columns.map((col) => (
           <nav key={col.id} aria-label={col.title}>
-            <h4 className="mb-4 text-xs font-semibold tracking-[0.16em] uppercase">{col.title}</h4>
+            <h4 className="mb-4 font-display text-base tracking-wide uppercase">{col.title}</h4>
             <ul className="space-y-2.5 text-[15px]">
               {col.items?.map((item) => (
                 <li key={item.id}>
@@ -64,34 +73,21 @@ export function Footer({ settings, columns, legal }: Props) {
             </ul>
           </nav>
         ))}
-
-        <div>
-          <h4 className="mb-4 text-xs font-semibold tracking-[0.16em] uppercase">Visit the showroom</h4>
-          <ul className="space-y-2.5 text-[15px]">
-            <li className="text-on-inverse-muted">{settings.address}</li>
-            <li className="text-on-inverse-muted">{settings.workHours}</li>
-            <li>
-              <a href={`mailto:${settings.email}`} className={linkCls}>
-                {settings.email}
-              </a>
-            </li>
-            <li>
-              <Link href={routes.contacts()} className="underline decoration-on-inverse/40 underline-offset-4 hover:decoration-on-inverse">
-                All contact details
-              </Link>
-            </li>
-          </ul>
-        </div>
       </Container>
 
       <div className="border-t border-on-inverse/10">
-        <Container className="flex flex-wrap items-center gap-x-6 gap-y-2 py-6 text-sm text-on-inverse-muted">
-          <span>© {settings.siteName} — a fictional dealership, built as a portfolio project</span>
-          {legal.map((l) => (
-            <Link key={l.id} href={navHref(l)} className="hover:text-on-inverse">
-              {l.title}
+        <Container className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 py-6 text-sm text-on-inverse-muted">
+          <span>© {settings.siteName} · a fictional dealership, built as a portfolio project</span>
+          <span className="flex flex-wrap gap-x-6 gap-y-2">
+            {legal.map((l) => (
+              <Link key={l.id} href={navHref(l)} className="hover:text-on-inverse">
+                {l.title}
+              </Link>
+            ))}
+            <Link href={routes.contacts()} className="hover:text-on-inverse">
+              Contact
             </Link>
-          ))}
+          </span>
         </Container>
       </div>
     </footer>

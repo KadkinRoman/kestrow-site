@@ -1,55 +1,61 @@
 @import "tailwindcss";
 
 /*
- * Kestrow Motors design tokens — "warm minimalism": warm off-white base, espresso ink, an oak accent,
- * an editorial serif for headlines (Instrument Serif) and Inter for text. Fonts come from next/font
- * (CSS variables --font-display / --font-text set on <html> in app/layout.tsx).
+ * Kestrow Motors design tokens — cool and technical: white and blue-grey surfaces, "night" navy for the hero
+ * and footer, cobalt for the primary action, signal orange for price drops, green for great prices.
+ * Display: Archivo (variable, condensed via font-stretch); text: Inter. Fonts come from next/font
+ * (CSS variables --font-archivo / --font-text set on <html> in app/layout.tsx).
  * Recolor ONLY here; components use token-based utilities (bg-surface, text-fg-muted, rounded-card…).
  */
 @theme {
   /* Typography */
   --font-sans: var(--font-text), ui-sans-serif, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-display: var(--font-serif), "Iowan Old Style", Georgia, serif;
+  --font-display: var(--font-archivo), "Arial Narrow", ui-sans-serif, sans-serif;
 
   /* Colors: surfaces and text */
-  --color-bg: #f6f3ee;
-  --color-fg: #1f1b17;
-  --color-fg-muted: #6a6159;
-  --color-line: #ded6cb;
-  --color-surface: #eee8df;
-  --color-surface-strong: #e3dbcf;
-  --color-paper: #fbfaf7;
+  --color-bg: #ffffff;
+  --color-fg: #111827;
+  --color-fg-muted: #5b6472;
+  --color-line: #e2e6ec;
+  --color-surface: #f3f5f8;
+  --color-surface-strong: #e7ebf1;
+  --color-paper: #ffffff;
 
   /* Accents */
-  --color-primary: #1f1b17;
-  --color-primary-hover: #3b332c;
-  --color-on-primary: #f6f3ee;
-  --color-accent: #8a5a3c;
-  --color-on-accent: #ffffff;
+  --color-primary: #1f4bff;
+  --color-primary-hover: #1238d6;
+  --color-on-primary: #ffffff;
+  /* cobalt for text on night backgrounds (contrast ~7:1 on #0b1220) */
+  --color-primary-light: #8aa4ff;
+  --color-accent: #ff5a1f;
+  --color-on-accent: #0b1220;
+  --color-ink: #0b1220;
 
-  /* Dark blocks (lead forms, tiles, footer) */
-  --color-inverse: #211d19;
-  --color-on-inverse: #f6f3ee;
-  --color-on-inverse-muted: #bfb4a8;
+  /* Night blocks (hero, lead forms, footer) */
+  --color-inverse: #0b1220;
+  --color-inverse-2: #141c2e;
+  --color-on-inverse: #ffffff;
+  --color-on-inverse-muted: #a7b0c0;
 
   /* States */
-  --color-success: #4f6b47;
-  --color-danger: #b3261e;
-  --color-star: #c08a2b;
+  --color-success: #047857;
+  --color-danger: #c81e1e;
+  --color-star: #f5a524;
 
   /* Radii */
-  --radius-control: 999px;
-  --radius-card: 14px;
-  --radius-media: 10px;
-  --radius-block: 22px;
+  --radius-control: 6px;
+  --radius-card: 8px;
+  --radius-media: 6px;
+  --radius-block: 12px;
+  --radius-badge: 4px;
 
   /* Grid */
-  --container-site: 1280px;
+  --container-site: 1320px;
   --container-prose: 720px;
 
   /* Shadows */
-  --shadow-card: 0 1px 2px rgb(31 27 23 / 0.04), 0 10px 30px rgb(31 27 23 / 0.07);
-  --shadow-modal: 0 24px 64px rgb(31 27 23 / 0.28);
+  --shadow-card: 0 1px 2px rgb(11 18 32 / 0.06), 0 8px 24px rgb(11 18 32 / 0.08);
+  --shadow-modal: 0 24px 64px rgb(11 18 32 / 0.3);
 
   /* Animations */
   --animate-ticker: ticker 40s linear infinite;
@@ -58,25 +64,23 @@
       transform: translateX(-50%);
     }
   }
-  @keyframes reveal {
-    from {
-      opacity: 0;
-      transform: translateY(28px);
-    }
-  }
 }
 
 /*
- * Headlines in the display serif. Unlayered on purpose: it wins over the font-weight utilities
- * (font-semibold…) that components put on h1/h2 — the serif has a single weight.
+ * Headlines in condensed Archivo. Unlayered on purpose: it wins over the font-weight utilities that the
+ * shared components put on h1/h2. Prices and figures use tabular numerals (.tabular).
  */
 h1,
 h2,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-synthesis-weight: none;
-  letter-spacing: -0.008em;
+  font-weight: 800;
+  font-stretch: 78%;
+  letter-spacing: -0.012em;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
 }
 
 @layer base {
@@ -93,7 +97,7 @@ h2,
   h1,
   h2 {
     text-wrap: balance;
-    line-height: 1.04;
+    line-height: 1;
   }
   h3 {
     text-wrap: balance;
@@ -160,22 +164,16 @@ h2,
     @apply list-disc space-y-2 pl-6;
   }
   .prose-article blockquote {
-    @apply border-l-2 border-accent pl-6 font-display text-2xl leading-snug md:text-3xl;
+    @apply border-l-4 border-primary pl-6 font-display text-2xl leading-snug md:text-3xl;
   }
 
   /* Small uppercase label above headings */
   .eyebrow {
-    @apply text-xs font-semibold tracking-[0.18em] text-accent uppercase;
+    @apply flex items-center gap-2 text-xs font-bold tracking-[0.14em] text-primary uppercase;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply h-0.5 w-6 bg-primary;
   }
 
-  /* Subtle scroll reveal (CSS scroll-driven animations; browsers without support show content as is) */
-  @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
-      .reveal {
-        animation: reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 0% entry 55%;
-      }
-    }
-  }
 }
