@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_shared_text_items",
+  "info": {
+    "displayName": "List item",
+    "icon": "dash",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "text": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

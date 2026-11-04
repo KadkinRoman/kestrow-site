@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_article_tables",
+  "info": {
+    "displayName": "Table",
+    "icon": "grid",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "caption": {
+      "type": "string"
+    },
+    "rows": {
+      "type": "json",
+      "required": true,
+      "description": "Array of rows: [[\"\", \"Gasoline\", \"Hybrid\"], [\"Price\", \"Lower\", \"Medium\"]]. The first row is the header."
+    }
+  }
+}

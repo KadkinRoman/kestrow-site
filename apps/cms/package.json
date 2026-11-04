@@ -1,0 +1,44 @@
+{
+  "name": "cms",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Kestrow Motors CMS — Strapi 5 backend for the Kestrow Motors car dealership site",
+  "scripts": {
+    "build": "strapi build",
+    "console": "strapi console",
+    "deploy": "strapi deploy",
+    "dev": "strapi develop",
+    "develop": "strapi develop",
+    "start": "strapi start",
+    "strapi": "strapi",
+    "upgrade": "npx @strapi/upgrade latest",
+    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+  },
+  "dependencies": {
+    "@strapi/database": "5.58.0",
+    "@strapi/plugin-cloud": "5.58.0",
+    "@strapi/plugin-users-permissions": "5.58.0",
+    "@strapi/strapi": "5.58.0",
+    "better-sqlite3": "12.8.0",
+    "pg": "^8.23.1",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-router-dom": "^6.30.3",
+    "strapi-plugin-navigation": "^3.3.7",
+    "styled-components": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.0.0 <=26.x.x",
+    "npm": ">=6.0.0"
+  },
+  "strapi": {
+    "uuid": "dd38c6d6-ad22-40ea-89a0-b916491989cf",
+    "installId": "d6dbb10ba447b0c897898ab764fd47731b92d3fcbf545326e498d670fc7d146d"
+  }
+}

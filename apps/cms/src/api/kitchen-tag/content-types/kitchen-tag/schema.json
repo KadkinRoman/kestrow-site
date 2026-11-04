@@ -1,0 +1,35 @@
+{
+  "kind": "collectionType",
+  "collectionName": "kitchen_tags",
+  "info": {
+    "singularName": "kitchen-tag",
+    "pluralName": "kitchen-tags",
+    "displayName": "Collection",
+    "description": "Flag for quick inventory collections, such as “Under 30,000 miles” and “Family-friendly”. Editors set it on a vehicle"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "kitchens": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::kitchen.kitchen",
+      "mappedBy": "tags"
+    }
+  }
+}

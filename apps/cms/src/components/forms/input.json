@@ -1,0 +1,44 @@
+{
+  "collectionName": "components_forms_inputs",
+  "info": {
+    "displayName": "Form field",
+    "icon": "pencil",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "regex": "^[a-zA-Z][a-zA-Z0-9_]*$"
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "text",
+        "tel",
+        "email",
+        "textarea",
+        "file",
+        "radio",
+        "checkbox"
+      ],
+      "default": "text"
+    },
+    "placeholder": {
+      "type": "string"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "options": {
+      "type": "text",
+      "description": "For radio: one option per line"
+    }
+  }
+}

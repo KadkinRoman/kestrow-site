@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Secrets: only *.env.example is committed
+.env
+.env.*
+!.env.example
+# Deployment: real env files and local secrets (deploy/env/*.env.example are templates, tracked in git)
+*.local.*
+deploy/env/*
+!deploy/env/*.example
+
+# Strapi
+apps/cms/.tmp/
+apps/cms/.cache/
+apps/cms/.strapi/
+apps/cms/build/
+apps/cms/dist/
+apps/cms/public/uploads/*
+!apps/cms/public/uploads/.gitkeep
+apps/cms/types/generated/
+apps/cms/.strapi-updater.json
+
+# Next.js
+apps/web/.next/
+apps/web/.leads-outbox/
+apps/web/out/
+apps/web/next-env.d.ts
+*.tsbuildinfo
+
+# Logs and junk
+*.log
+npm-debug.log*
+coverage/
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local AI tool settings
+.claude/

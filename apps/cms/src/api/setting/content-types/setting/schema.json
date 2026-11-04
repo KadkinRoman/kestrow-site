@@ -1,0 +1,71 @@
+{
+  "kind": "singleType",
+  "collectionName": "settings",
+  "info": {
+    "singularName": "setting",
+    "pluralName": "settings",
+    "displayName": "Site settings",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "siteName": {
+      "type": "string",
+      "required": true,
+      "default": "Kestrow Motors"
+    },
+    "phone": {
+      "type": "string",
+      "required": true
+    },
+    "email": {
+      "type": "email"
+    },
+    "address": {
+      "type": "string"
+    },
+    "socials": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.social"
+    },
+    "reviewLinks": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.link"
+    },
+    "header": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.header"
+    },
+    "footer": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.footer"
+    },
+    "forms": {
+      "type": "component",
+      "repeatable": false,
+      "component": "layout.forms"
+    },
+    "mapUrl": {
+      "type": "string",
+      "description": "Google Maps link for the “Get directions” button"
+    },
+    "promoPeriod": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.period",
+      "description": "Shared validity period for offers (shown on every offer without its own dates)"
+    },
+    "company": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.company"
+    }
+  }
+}

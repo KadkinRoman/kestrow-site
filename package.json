@@ -1,0 +1,23 @@
+{
+  "name": "kestrow-site",
+  "private": true,
+  "description": "Kestrow Motors car dealership demo site: Strapi 5 + Next.js 16",
+  "engines": {
+    "node": ">=20.9.0 <=24.x.x"
+  },
+  "scripts": {
+    "setup": "npm install && npm --prefix apps/cms install && npm --prefix apps/web install",
+    "dev": "concurrently -n cms,web -c blue,green \"npm:dev:cms\" \"npm:dev:web\"",
+    "dev:cms": "npm --prefix apps/cms run develop",
+    "dev:web": "npm --prefix apps/web run dev",
+    "build": "npm run build:cms && npm run build:web",
+    "build:cms": "npm --prefix apps/cms run build",
+    "build:web": "npm --prefix apps/web run build",
+    "lint": "npm --prefix apps/web run lint",
+    "typecheck": "npm --prefix apps/web run typecheck",
+    "test": "npm --prefix apps/web run test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
+  }
+}

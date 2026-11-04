@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_article_ctas",
+  "info": {
+    "displayName": "Call to action (form)",
+    "icon": "cursor",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "text"
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "Get a quote"
+    }
+  }
+}

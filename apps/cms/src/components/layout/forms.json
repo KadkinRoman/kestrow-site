@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_layout_formss",
+  "info": {
+    "displayName": "Form texts",
+    "icon": "pencil",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "consentText": {
+      "type": "text"
+    },
+    "successTitle": {
+      "type": "string"
+    },
+    "successText": {
+      "type": "text"
+    },
+    "errorText": {
+      "type": "text"
+    }
+  }
+}

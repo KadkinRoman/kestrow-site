@@ -1,0 +1,88 @@
+{
+  "kind": "collectionType",
+  "collectionName": "reviews",
+  "info": {
+    "singularName": "review",
+    "pluralName": "reviews",
+    "displayName": "Review",
+    "description": "Customer reviews: text or video, source and link to it, neighborhood, link to a vehicle"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "caption": {
+      "type": "string",
+      "description": "Card caption, for example “Alex’s RAV4 Hybrid”"
+    },
+    "text": {
+      "type": "text"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "rating": {
+      "type": "integer",
+      "min": 1,
+      "max": 5,
+      "default": 5
+    },
+    "video": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "videos"
+      ]
+    },
+    "videoUrl": {
+      "type": "string",
+      "description": "Link to the video review (instead of a file upload)"
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": [
+        "site",
+        "google",
+        "houzz"
+      ],
+      "default": "site"
+    },
+    "url": {
+      "type": "string",
+      "description": "Link to the original review (Google, Cars.com)"
+    },
+    "place": {
+      "type": "string",
+      "description": "Neighborhood"
+    },
+    "date": {
+      "type": "date"
+    },
+    "kitchen": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::kitchen.kitchen",
+      "inversedBy": "reviews"
+    },
+    "showOnHome": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show on the home page"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_shared_companies",
+  "info": {
+    "displayName": "Company details",
+    "icon": "briefcase",
+    "description": "Legal entity for the Company details block and the Privacy Policy"
+  },
+  "options": {},
+  "attributes": {
+    "legalName": {
+      "type": "string"
+    },
+    "registrationNumber": {
+      "type": "string"
+    },
+    "taxId": {
+      "type": "string"
+    },
+    "legalAddress": {
+      "type": "string"
+    }
+  }
+}

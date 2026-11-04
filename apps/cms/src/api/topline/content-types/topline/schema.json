@@ -1,0 +1,29 @@
+{
+  "kind": "singleType",
+  "collectionName": "toplines",
+  "info": {
+    "singularName": "topline",
+    "pluralName": "toplines",
+    "displayName": "Top bar",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "text": {
+      "type": "string"
+    },
+    "linkLabel": {
+      "type": "string"
+    },
+    "linkUrl": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,64 @@
+# Caddyfile template for your own server: reverse proxy for the site and the admin panel, automatic HTTPS (Let's Encrypt).
+# Replace example.com with your domain; container names are <COMPOSE_PROJECT_NAME>-web / -cms (here the project is kestrow).
+# Caddy runs as a separate container in the same docker network (PROXY_NETWORK in deploy/.env), ports 80/443 published, volumes caddy_data/caddy_config.
+# Example start: docker run -d --name caddy --network proxy --restart unless-stopped -p 80:80 -p 443:443 \
+#   -v /opt/caddy/Caddyfile:/etc/caddy/Caddyfile:ro -v caddy_data:/data -v caddy_config:/config caddy:2
+
+{
+	email admin@example.com
+}
+
+(kestrow_security) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+		-X-Powered-By
+	}
+	log {
+		output stdout
+		format json
+	}
+}
+
+# www -> apex (301); Caddy enables https itself
+www.example.com {
+	redir https://example.com{uri} permanent
+}
+
+example.com {
+	import kestrow_security
+	# Cache reset is internal only (Strapi webhook -> http://web:3000/api/revalidate)
+	@revalidate path /api/revalidate
+	respond @revalidate 404
+	# Health probe - only from the monitoring address (replace 203.0.113.10; drop the block if the probe is external)
+	@healthForeign {
+		path /api/health
+		not remote_ip 203.0.113.10
+	}
+	respond @healthForeign 404
+	# Lead request: fields + a file up to 10 MB
+	@lead path /api/lead
+	request_body @lead {
+		max_size 11MB
+	}
+	reverse_proxy kestrow-web:3000 {
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+cms.example.com {
+	import kestrow_security
+	# Optionally restrict the admin panel to the office network:
+	# @adminForeign { path /admin* ; not remote_ip <office IP> }
+	# respond @adminForeign 403
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy kestrow-cms:1337 {
+		header_up X-Real-IP {remote_host}
+	}
+}

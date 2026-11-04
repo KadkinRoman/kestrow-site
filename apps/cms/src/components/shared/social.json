@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_shared_socials",
+  "info": {
+    "displayName": "Social network / messenger",
+    "icon": "message",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "instagram",
+        "pinterest",
+        "facebook",
+        "whatsapp",
+        "telegram",
+        "youtube"
+      ],
+      "default": "instagram"
+    },
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

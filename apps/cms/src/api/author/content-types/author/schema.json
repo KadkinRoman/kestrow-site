@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "authors",
+  "info": {
+    "singularName": "author",
+    "pluralName": "authors",
+    "displayName": "Team member",
+    "description": "Company staff: the team on the About page, plus blog authors and experts"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "role": {
+      "type": "string",
+      "description": "Job title"
+    },
+    "photo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "text": {
+      "type": "text",
+      "description": "About the team member — for the team card and the detail dialog"
+    },
+    "isTeam": {
+      "type": "boolean",
+      "default": false,
+      "description": "Show in the Team block on the About page"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    },
+    "articles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article",
+      "mappedBy": "author"
+    },
+    "expertArticles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::article.article",
+      "mappedBy": "expert"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_article_tips",
+  "info": {
+    "displayName": "Tip",
+    "icon": "lightbulb",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Designer’s tip"
+    },
+    "text": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

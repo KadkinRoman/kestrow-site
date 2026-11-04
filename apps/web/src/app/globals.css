@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/*
+ * Kestrow Motors design tokens — "warm minimalism": warm off-white base, espresso ink, an oak accent,
+ * an editorial serif for headlines (Instrument Serif) and Inter for text. Fonts come from next/font
+ * (CSS variables --font-display / --font-text set on <html> in app/layout.tsx).
+ * Recolor ONLY here; components use token-based utilities (bg-surface, text-fg-muted, rounded-card…).
+ */
+@theme {
+  /* Typography */
+  --font-sans: var(--font-text), ui-sans-serif, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: var(--font-serif), "Iowan Old Style", Georgia, serif;
+
+  /* Colors: surfaces and text */
+  --color-bg: #f6f3ee;
+  --color-fg: #1f1b17;
+  --color-fg-muted: #6a6159;
+  --color-line: #ded6cb;
+  --color-surface: #eee8df;
+  --color-surface-strong: #e3dbcf;
+  --color-paper: #fbfaf7;
+
+  /* Accents */
+  --color-primary: #1f1b17;
+  --color-primary-hover: #3b332c;
+  --color-on-primary: #f6f3ee;
+  --color-accent: #8a5a3c;
+  --color-on-accent: #ffffff;
+
+  /* Dark blocks (lead forms, tiles, footer) */
+  --color-inverse: #211d19;
+  --color-on-inverse: #f6f3ee;
+  --color-on-inverse-muted: #bfb4a8;
+
+  /* States */
+  --color-success: #4f6b47;
+  --color-danger: #b3261e;
+  --color-star: #c08a2b;
+
+  /* Radii */
+  --radius-control: 999px;
+  --radius-card: 14px;
+  --radius-media: 10px;
+  --radius-block: 22px;
+
+  /* Grid */
+  --container-site: 1280px;
+  --container-prose: 720px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgb(31 27 23 / 0.04), 0 10px 30px rgb(31 27 23 / 0.07);
+  --shadow-modal: 0 24px 64px rgb(31 27 23 / 0.28);
+
+  /* Animations */
+  --animate-ticker: ticker 40s linear infinite;
+  @keyframes ticker {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(28px);
+    }
+  }
+}
+
+/*
+ * Headlines in the display serif. Unlayered on purpose: it wins over the font-weight utilities
+ * (font-semibold…) that components put on h1/h2 — the serif has a single weight.
+ */
+h1,
+h2,
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-synthesis-weight: none;
+  letter-spacing: -0.008em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2 {
+    text-wrap: balance;
+    line-height: 1.04;
+  }
+  h3 {
+    text-wrap: balance;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  dialog::backdrop {
+    background: rgb(0 0 0 / 0.5);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Media placeholder (photo/video) until real assets arrive */
+  .placeholder-stripes {
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--color-surface),
+      var(--color-surface) 10px,
+      var(--color-surface-strong) 10px,
+      var(--color-surface-strong) 20px
+    );
+  }
+
+  /* Horizontal strips without a scrollbar */
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Article text */
+  .prose-article {
+    @apply text-[17px] leading-relaxed;
+  }
+  .prose-article > * + * {
+    @apply mt-5;
+  }
+  .prose-article h2 {
+    @apply mt-12 text-3xl md:text-4xl;
+  }
+  .prose-article h3 {
+    @apply mt-8 text-xl font-semibold;
+  }
+  .prose-article ul {
+    @apply list-disc space-y-2 pl-6;
+  }
+  .prose-article blockquote {
+    @apply border-l-2 border-accent pl-6 font-display text-2xl leading-snug md:text-3xl;
+  }
+
+  /* Small uppercase label above headings */
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.18em] text-accent uppercase;
+  }
+
+  /* Subtle scroll reveal (CSS scroll-driven animations; browsers without support show content as is) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 55%;
+      }
+    }
+  }
+}

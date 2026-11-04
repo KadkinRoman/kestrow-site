@@ -1,0 +1,52 @@
+{
+  "kind": "collectionType",
+  "collectionName": "forms",
+  "info": {
+    "singularName": "form",
+    "pluralName": "forms",
+    "displayName": "Form",
+    "description": "Request forms: fields and submission to Bitrix24"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "formId": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^[a-z][a-z0-9-]*$"
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Send"
+    },
+    "successMessage": {
+      "type": "text"
+    },
+    "willSendToCrm": {
+      "type": "boolean",
+      "default": true
+    },
+    "crmTitle": {
+      "type": "string",
+      "description": "Lead title in Bitrix24 (TITLE)"
+    },
+    "crmSourceId": {
+      "type": "string",
+      "default": "CALLBACK",
+      "regex": "^[A-Za-z0-9_|]+$",
+      "description": "Lead source code in Bitrix24 (SOURCE_ID): CALLBACK — website contact form, STORE — website footer, REPEAT_SALE — website quiz"
+    },
+    "inputs": {
+      "type": "component",
+      "repeatable": true,
+      "component": "forms.input"
+    }
+  }
+}

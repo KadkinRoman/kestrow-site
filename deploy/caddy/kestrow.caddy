@@ -1,0 +1,56 @@
+# Kestrow demo production on the shared VPS. Included from the shared Caddyfile with the line
+#   import /etc/caddy/sites/*.caddy
+# Before copying to the server, substitute the basic_auth password hash for the CMS admin:
+#   docker exec -i caddy caddy hash-password < password-file   (__BASIC_AUTH_HASH__ -> hash)
+# The site containers sit in the b24net network (the shared proxy network) as kestrow-web / kestrow-cms (see compose).
+
+(kestrow_common) {
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+	log {
+		output stdout
+		format json
+	}
+}
+
+# Public site - indexable, no basic auth
+kestrow.193-233-216-209.sslip.io {
+	import kestrow_common
+	# Cache reset is internal only (the Strapi webhook calls http://web:3000/api/revalidate directly)
+	@revalidate path /api/revalidate
+	respond @revalidate 404
+	# Lead request: fields + a file up to 10 MB
+	@lead path /api/lead
+	request_body @lead {
+		max_size 11MB
+	}
+	reverse_proxy kestrow-web:3000 {
+		# The site rate-limits leads per IP using this header; Caddy appends X-Forwarded-For itself
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+# Strapi admin. /api/* and /uploads/* stay open (the CI web build and next/image read them); only the admin HTML
+# document is behind basic_auth (the admin app's own requests to /admin/* carry Authorization: Bearer and do not match).
+# The CMS host is not meant to be indexed.
+cms-kestrow.193-233-216-209.sslip.io {
+	import kestrow_common
+	header X-Robots-Tag "noindex, nofollow"
+	@adminPage {
+		path /admin /admin/*
+		header Accept *text/html*
+	}
+	basic_auth @adminPage {
+		kestrow __BASIC_AUTH_HASH__
+	}
+	request_body {
+		max_size 60MB
+	}
+	reverse_proxy kestrow-cms:1337 {
+		header_up X-Real-IP {remote_host}
+	}
+}

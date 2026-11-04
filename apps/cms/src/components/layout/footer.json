@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_layout_footers",
+  "info": {
+    "displayName": "Footer",
+    "icon": "layout",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "about": {
+      "type": "text"
+    },
+    "copyright": {
+      "type": "string"
+    },
+    "legalName": {
+      "type": "string"
+    },
+    "requisites": {
+      "type": "text"
+    }
+  }
+}

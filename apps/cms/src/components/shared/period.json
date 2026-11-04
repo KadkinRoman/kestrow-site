@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_shared_periods",
+  "info": {
+    "displayName": "Period",
+    "icon": "calendar",
+    "description": "Validity period: from … to …"
+  },
+  "options": {},
+  "attributes": {
+    "startsAt": {
+      "type": "date"
+    },
+    "endsAt": {
+      "type": "date"
+    }
+  }
+}

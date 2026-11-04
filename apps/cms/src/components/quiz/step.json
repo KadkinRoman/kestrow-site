@@ -1,0 +1,33 @@
+{
+  "collectionName": "components_quiz_steps",
+  "info": {
+    "displayName": "Quiz step",
+    "icon": "question",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "key": {
+      "type": "string",
+      "required": true,
+      "regex": "^[a-z][a-z0-9-]*$"
+    },
+    "question": {
+      "type": "string",
+      "required": true
+    },
+    "options": {
+      "type": "text",
+      "required": true,
+      "description": "One option per line"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

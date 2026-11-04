@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "singularName": "page",
+    "pluralName": "pages",
+    "displayName": "Page",
+    "description": "Static site pages: path, SEO, menu item, intro and text sections (no block builder)"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "title",
+      "required": true
+    },
+    "path": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "regex": "^/[a-z0-9\\-/]*$"
+    },
+    "lead": {
+      "type": "text",
+      "description": "Intro under the heading"
+    },
+    "sections": {
+      "type": "component",
+      "repeatable": true,
+      "component": "page.section",
+      "description": "Text sections of the page (Buyer’s guide, Contact, Privacy Policy)"
+    },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    }
+  }
+}

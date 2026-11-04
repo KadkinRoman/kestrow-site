@@ -1,0 +1,124 @@
+# Kestrow site: PostgreSQL + Strapi (cms) + Next.js (web) - one layout for any VPS (demo production on a shared server, or your own).
+#
+#   /opt/<project>/.env           variables of this file: project, images and tags, ENV_DIR, proxy network (deploy/.env.example)
+#   /opt/<project>/env/*.env      service variables and secrets, mode 600 (deploy/env/*.env.example)
+#   deploy/scripts/compose.sh     docker compose wrapper with the right --project-directory / --env-file / -f
+#
+# No ports are published on the host: the reverse proxy (Caddy) reaches the containers over the external network
+# ${PROXY_NETWORK} (b24net on the shared demo server) by container name <project>-web:3000 and <project>-cms:1337.
+# Memory limits are sized for a 2 GB server: cms 640 MB (heap 448), web 448 MB (heap 320), db 256 MB (shared_buffers 64 MB).
+
+name: ${COMPOSE_PROJECT_NAME:-kestrow}
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: ${COMPOSE_PROJECT_NAME:-kestrow}-db
+    restart: unless-stopped
+    env_file:
+      - ${ENV_DIR:-./env}/db.env
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=40", "-c", "work_mem=4MB"]
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging: *logging
+
+  cms:
+    image: ${CMS_IMAGE:-ghcr.io/kadkinroman/kestrow-cms}:${CMS_TAG:-main}
+    container_name: ${COMPOSE_PROJECT_NAME:-kestrow}-cms
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 20s
+    env_file:
+      - ${ENV_DIR:-./env}/cms.env
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=448
+      # The database is always the neighbouring container; behind the proxy, trust X-Forwarded-For (admin login rate limit by IP)
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: db
+      DATABASE_PORT: "5432"
+      BEHIND_PROXY: "true"
+    volumes:
+      - cms-uploads:/app/public/uploads
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:1337/_health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 640M
+    logging: *logging
+
+  web:
+    image: ${WEB_IMAGE:-ghcr.io/kadkinroman/kestrow-web}:${WEB_TAG:-prod-main}
+    container_name: ${COMPOSE_PROJECT_NAME:-kestrow}-web
+    restart: unless-stopped
+    init: true
+    env_file:
+      - ${ENV_DIR:-./env}/web.env
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=320
+      # Strapi is reached over the internal network; the site loads images from STRAPI_PUBLIC_URL in web.env (same as at image build time)
+      STRAPI_URL: http://cms:1337
+      LEADS_OUTBOX_DIR: /data/leads
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+    volumes:
+      - web-leads:/data/leads
+    networks:
+      - internal
+      - proxy
+    depends_on:
+      cms:
+        condition: service_started
+    healthcheck:
+      # 503 = the lead queue is not writable or leads have been waiting > 15 min - the container shows as unhealthy, no restart
+      test: ["CMD", "wget", "-qO", "/dev/null", "http://127.0.0.1:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 448M
+    logging: *logging
+
+volumes:
+  pg-data:
+  cms-uploads:
+  # Lead queue: personal data, not included in backups (retention is limited by the site code)
+  web-leads:
+
+networks:
+  internal:
+  proxy:
+    external: true
+    name: ${PROXY_NETWORK:-b24net}

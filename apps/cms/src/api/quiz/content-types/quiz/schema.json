@@ -1,0 +1,35 @@
+{
+  "kind": "singleType",
+  "collectionName": "quizzes",
+  "info": {
+    "singularName": "quiz",
+    "pluralName": "quizzes",
+    "displayName": "Find your car quiz",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "steps": {
+      "type": "component",
+      "repeatable": true,
+      "component": "quiz.step"
+    },
+    "finalTitle": {
+      "type": "string"
+    },
+    "finalText": {
+      "type": "text"
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Get my matches"
+    }
+  }
+}

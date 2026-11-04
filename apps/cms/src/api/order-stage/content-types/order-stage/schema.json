@@ -1,0 +1,45 @@
+{
+  "kind": "collectionType",
+  "collectionName": "order_stages",
+  "info": {
+    "singularName": "order-stage",
+    "pluralName": "order-stages",
+    "displayName": "Process step",
+    "description": "Steps of the buying process, trade-in, financing, warranty claims and so on — the group decides which page shows them"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "text": {
+      "type": "text"
+    },
+    "group": {
+      "type": "enumeration",
+      "enum": [
+        "home",
+        "kitchen",
+        "about",
+        "offers",
+        "materials",
+        "warranty",
+        "payment",
+        "measurement",
+        "delivery",
+        "installation",
+        "contact",
+        "reviews"
+      ],
+      "default": "home"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

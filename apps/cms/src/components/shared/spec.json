@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_specs",
+  "info": {
+    "displayName": "Specification",
+    "icon": "bulletList",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "value": {
+      "type": "string",
+      "required": true
+    }
+  }
+}

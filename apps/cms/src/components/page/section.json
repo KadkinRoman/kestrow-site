@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_page_sections",
+  "info": {
+    "displayName": "Page section",
+    "icon": "layout",
+    "description": "Heading, text and image — a fixed block for text pages (not a builder)"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "blocks"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}
