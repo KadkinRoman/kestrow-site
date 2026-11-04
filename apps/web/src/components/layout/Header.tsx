@@ -28,7 +28,10 @@ export function Header({ settings, navigation, topline }: Props) {
         </div>
       )}
 
-      <header className="sticky top-0 z-40 border-b border-line/70 bg-bg/85 backdrop-blur-md backdrop-saturate-150">
+      <header className="sticky top-0 z-40 border-b border-line/70">
+        {/* Frosted background on its own layer: backdrop-filter on the header itself would become the containing
+            block of the fixed mobile menu panel inside it and collapse the panel to the header height */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 bg-bg/85 backdrop-blur-md backdrop-saturate-150" />
         <Container className="flex h-16 items-center gap-6 xl:h-20">
           <Logo tagline={settings.tagline} />
 
